@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Math Quiz App</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: #0f172a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .app {
+            background: #1e293b;
+            padding: 20px;
+            width: 340px;
+            border-radius: 15px;
+            color: white;
+            text-align: center;
+        }
+
+        #timer {
+            font-size: 18px;
+            color: #38bdf8;
+            margin-bottom: 10px;
+        }
+
+        #scoreBox {
+            color: #22c55e;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        #question {
+            font-size: 20px;
+            margin: 20px 0;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: none;
+            border-radius: 8px;
+            background: #334155;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #475569;
+        }
+
+        #feedback {
+            margin-top: 15px;
+            font-weight: bold;
+            min-height: 40px;
+        }
+
+        #nextBtn {
+            display: none;
+            background: #2563eb;
+        }
+
+        #result {
+            display: none;
+            background: #0f172a;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <h2>🧠 Math Quiz</h2>
+
+    <div id="timer">05:00</div>
+
+    <div id="scoreBox">Score: 0</div>
+
+    <div id="question"></div>
+
+    <div id="options"></div>
+
+    <div id="feedback"></div>
+
+    <button id="nextBtn" onclick="nextQuestion()">
+        Next Question
+    </button>
+
+    <div id="result"></div>
+
+</div>
+
+<script>
+
+let questions = [
+    { q: "2 + 2 = ?", options: ["3","4","5","6"], answer: "4" },
+    { q: "50 × 3xy = ?", options: ["600x","150xy","150","9"], answer: "150xy" },
+    { q: "150 × 3 = ?", options: ["450","60","70","8"], answer: "450" },
+    { q: "3 × 3 = ?", options: ["6","9","12","15"], answer: "9" },
+    { q: "54 ÷ 3 = ?", options: ["18","3","34","26"], answer: "18" }
+];
+
+let current = 0;
+let score = 0;
+
+let time = 300; // 5 minutes
+
+updateScore();
+
+let timer = setInterval(function() {
+
+    let minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    if (seconds < 10) {
+        seconds = "0" + seconds;
+    }
+
+    document.getElementById("timer").innerText =
+        minutes + ":" + seconds;
+
+    time--;
+
+    if (time < 0) {
+        clearInterval(timer);
+        showResult();
+    }
+
+}, 1000);
+
+function updateScore() {
+    document.getElementById("scoreBox").innerText =
+        "Score: " + score;
+}
+
+function showQuestion() {
+
+    let q = questions[current];
+
+    document.getElementById("question").innerText = q.q;
+
+    document.getElementById("feedback").innerHTML = "";
+
+    document.getElementById("nextBtn").style.display = "none";
+
+    let box = document.getElementById("options");
+
+    box.innerHTML = "";
+
+    for (let i = 0; i < q.options.length; i++) {
+
+        box.innerHTML += `
+        <button onclick="checkAnswer('${q.options[i]}')">
+            ${q.options[i]}
+        </button>
+        `;
+    }
+}
+
+function checkAnswer(selected) {
+
+    let correct = questions[current].answer;
+
+    let feedbackBox =
+        document.getElementById("feedback");
+
+    if (selected === correct) {
+
+        score++;
+
+        updateScore();
+
+        feedbackBox.innerHTML =
+            "✅ Keep it up!";
+
+    } else {
+
+        feedbackBox.innerHTML =
+            "❌ Wrong!<br>Correct answer: <b>"
+            + correct +
+            "</b>";
+    }
+
+    document.getElementById("options").innerHTML = "";
+
+    document.getElementById("nextBtn").style.display =
+        "block";
+}
+
+function nextQuestion() {
+
+    current++;
+
+    if (current < questions.length) {
+
+        showQuestion();
+
+    } else {
+
+        clearInterval(timer);
+
+        showResult();
+    }
+}
+
+function showResult() {
+
+    document.getElementById("question").style.display =
+        "none";
+
+    document.getElementById("options").style.display =
+        "none";
+
+    document.getElementById("feedback").style.display =
+        "none";
+
+    document.getElementById("nextBtn").style.display =
+        "none";
+
+    document.getElementById("timer").style.display =
+        "none";
+
+    document.getElementById("scoreBox").style.display =
+        "none";
+
+    let percent =
+        (score / questions.length) * 100;
+
+    let message = "";
+
+    if (percent >= 80) {
+
+        message = "MATH MASTER 🔥";
+
+    } else if (percent >= 50) {
+
+        message = "YOU HAVE GOT THE SPIRIT 👍";
+
+    } else {
+
+        message = "Try Again";
+    }
+
+    document.getElementById("result").style.display =
+        "block";
+
+    document.getElementById("result").innerHTML = `
+        <h2>🎉 Quiz Finished</h2>
+
+        <p><b>Score:</b>
+        ${score} / ${questions.length}</p>
+
+        <p><b>Percentage:</b>
+        ${percent}%</p>
+
+        <h3>${message}</h3>
+    `;
+}
+
+showQuestion();
+
+</script>
+
+</body>
+</html>
